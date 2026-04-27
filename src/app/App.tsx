@@ -1,11 +1,7 @@
 import type { ReactNode } from "react";
 import { Suspense, useEffect } from "react";
 
-import {
-  Application,
-  AppStatus,
-  Notification,
-} from "@canonical/react-components";
+import { Application, Notification } from "@canonical/react-components";
 import { usePrevious } from "@canonical/react-components/dist/hooks";
 import * as Sentry from "@sentry/browser";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,7 +19,6 @@ import { MAAS_UI_ID } from "./constants";
 import { useGetCurrentUser } from "@/app/api/query/auth";
 import AppSideNavigation from "@/app/base/components/AppSideNavigation";
 import Login from "@/app/base/components/Login";
-import StatusBar from "@/app/base/components/StatusBar";
 import FileContext, { fileContextStore } from "@/app/base/file-context";
 import { useFetchActions } from "@/app/base/hooks";
 import { configActions } from "@/app/store/config";
@@ -195,9 +190,6 @@ export const App = (): React.ReactElement => {
         >
           {content}
         </Suspense>
-        <AppStatus>
-          <StatusBar />
-        </AppStatus>
       </ThemePreviewContextProvider>
     </Application>
   );
