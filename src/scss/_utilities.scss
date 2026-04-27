@@ -258,6 +258,7 @@
     "purple": #7764d8,
     "magenta": #974097,
     "red": #a71b33,
+    "cti": #2c6bc9,
   );
   @each $name, $color in $nav-theme-colors {
     .is-maas-#{$name} {

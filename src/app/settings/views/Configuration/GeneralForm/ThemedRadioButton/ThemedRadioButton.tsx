@@ -23,6 +23,7 @@ export enum ColorValues {
   Purple = "purple",
   Magenta = "magenta",
   Red = "red",
+  CTI = "cti",
 }
 
 const ThemedRadioButton = ({
