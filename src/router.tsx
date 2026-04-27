@@ -1,10 +1,11 @@
-import { lazy } from "react";
+import { lazy, type ReactElement } from "react";
 
 import { createBrowserRouter, Navigate } from "react-router";
 
 import App from "@/app/App";
 import ErrorBoundary from "@/app/base/components/ErrorBoundary";
 import PageContent from "@/app/base/components/PageContent";
+import SuperUserOnly from "@/app/base/components/SuperUserOnly";
 import urls from "@/app/base/urls";
 import NotFound from "@/app/base/views/NotFound";
 import APIKeyAdd from "@/app/preferences/views/APIKeys/APIKeyAdd";
@@ -47,6 +48,12 @@ const Tags = lazy(() => import("@/app/tags/views/Tags"));
 const ZonesList = lazy(() => import("@/app/zones/views"));
 
 const base = urls.preferences.index;
+const protectedRoute = (element: ReactElement) => (
+  <ErrorBoundary>
+    <SuperUserOnly>{element}</SuperUserOnly>
+  </ErrorBoundary>
+);
+
 export const router = createBrowserRouter(
   [
     {
@@ -67,19 +74,11 @@ export const router = createBrowserRouter(
         },
         {
           path: `${urls.zones.index}`,
-          element: (
-            <ErrorBoundary>
-              <ZonesList />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<ZonesList />),
         },
         {
           path: `${urls.networkDiscovery.index}/*`,
-          element: (
-            <ErrorBoundary>
-              <NetworkDiscovery />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<NetworkDiscovery />),
         },
         {
           path: urls.networkDiscovery.legacyIndex,
@@ -93,67 +92,35 @@ export const router = createBrowserRouter(
         },
         {
           path: `${urls.devices.index}/*`,
-          element: (
-            <ErrorBoundary>
-              <DeviceList />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<DeviceList />),
         },
         {
           path: `${urls.devices.device.index(null)}/*`,
-          element: (
-            <ErrorBoundary>
-              <DeviceDetails />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<DeviceDetails />),
         },
         {
           path: `${urls.domains.index}/*`,
-          element: (
-            <ErrorBoundary>
-              <DomainsList />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<DomainsList />),
         },
         {
           path: `${urls.domains.details(null)}/*`,
-          element: (
-            <ErrorBoundary>
-              <DomainDetails />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<DomainDetails />),
         },
         {
           path: `${urls.tags.index}/*`,
-          element: (
-            <ErrorBoundary>
-              <Tags />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<Tags />),
         },
         {
           path: `${urls.tags.tag.index(null)}/*`,
-          element: (
-            <ErrorBoundary>
-              <Tags />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<Tags />),
         },
         {
           path: `${urls.subnets.space.index(null)}/*`,
-          element: (
-            <ErrorBoundary>
-              <SpaceDetails />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<SpaceDetails />),
         },
         {
           path: `${urls.settings.index}/*`,
-          element: (
-            <ErrorBoundary>
-              <Settings />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<Settings />),
         },
         {
           path: `${urls.intro.index}/*`,
@@ -165,11 +132,7 @@ export const router = createBrowserRouter(
         },
         {
           path: `${urls.images.index}/*`,
-          element: (
-            <ErrorBoundary>
-              <ImageList />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<ImageList />),
         },
         {
           path: urls.preferences.index,
@@ -276,67 +239,35 @@ export const router = createBrowserRouter(
         },
         {
           path: `${urls.subnets.fabric.index(null)}/*`,
-          element: (
-            <ErrorBoundary>
-              <FabricDetails />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<FabricDetails />),
         },
         {
           path: `${urls.controllers.controller.index(null)}/*`,
-          element: (
-            <ErrorBoundary>
-              <ControllerDetails />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<ControllerDetails />),
         },
         {
           path: `${urls.controllers.index}/*`,
-          element: (
-            <ErrorBoundary>
-              <ControllerList />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<ControllerList />),
         },
         {
           path: `${urls.kvm.index}/*`,
-          element: (
-            <ErrorBoundary>
-              <KVM />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<KVM />),
         },
         {
           path: `${urls.pools.index}/*`,
-          element: (
-            <ErrorBoundary>
-              <PoolsList />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<PoolsList />),
         },
         {
           path: `${urls.subnets.index}/*`,
-          element: (
-            <ErrorBoundary>
-              <SubnetsList />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<SubnetsList />),
         },
         {
           path: `${urls.subnets.subnet.index(null)}/*`,
-          element: (
-            <ErrorBoundary>
-              <SubnetDetails />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<SubnetDetails />),
         },
         {
           path: `${urls.subnets.vlan.index(null)}/*`,
-          element: (
-            <ErrorBoundary>
-              <VLANDetails />
-            </ErrorBoundary>
-          ),
+          element: protectedRoute(<VLANDetails />),
         },
         {
           path: "*",
