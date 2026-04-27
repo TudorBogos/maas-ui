@@ -14,7 +14,7 @@
         scrollbar-gutter: stable;
 
         @media (min-width: $breakpoint-small) {
-          height: calc(100vh - 2.5rem);
+          height: 100%;
         }
       }
       .l-main__content {
