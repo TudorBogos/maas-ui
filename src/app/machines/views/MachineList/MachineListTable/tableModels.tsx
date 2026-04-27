@@ -243,7 +243,6 @@ export const generateRows = ({
   getToggleHandler,
   showActions,
   showMAC,
-  showFullName,
 }: GenerateRowParams): RowReturnType[] => {
   const getMenuHandler: GetMachineMenuToggleHandler = (...args) =>
     showActions ? getToggleHandler(...args) : () => undefined;
@@ -279,7 +278,6 @@ export const generateRows = ({
         <OwnerColumn
           data-testid="owner-column"
           onToggleMenu={getMenuHandler(MachineColumns.OWNER)}
-          showFullName={showFullName}
           systemId={row.system_id}
         />
       ),

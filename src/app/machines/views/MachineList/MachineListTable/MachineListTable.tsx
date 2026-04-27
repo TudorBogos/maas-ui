@@ -227,21 +227,6 @@ export const MachineListTable = ({
           >
             {columnLabels[MachineColumns.OWNER]}
           </TableHeader>
-          &nbsp;<strong>|</strong>&nbsp;
-          <TableHeader
-            currentSort={currentSort}
-            data-testid="owner-name-header"
-            onClick={() => {
-              sendAnalytics(
-                "Machine list",
-                "Column header",
-                "Show owner full name"
-              );
-              setShowFullName(true);
-            }}
-          >
-            Name
-          </TableHeader>
           <TableHeader>Tags</TableHeader>
         </>
       ),
