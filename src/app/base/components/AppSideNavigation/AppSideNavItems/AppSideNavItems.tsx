@@ -43,6 +43,10 @@ const AppSideNavItemGroup = ({
     return false;
   }, [group, path]);
 
+  if (group.adminOnly && !isAdmin) {
+    return null;
+  }
+
   return (
     <>
       <Navigation.Item hasActiveChild={hasActiveChild}>

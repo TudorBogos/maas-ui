@@ -13,6 +13,7 @@ const navGroups: NavGroup[] = [
         url: urls.machines.index,
       },
       {
+        adminOnly: true,
         highlight: [urls.devices.index, urls.devices.device.index(null)],
         label: "Devices",
         url: urls.devices.index,
@@ -29,50 +30,60 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    adminOnly: true,
     groupTitle: "KVM",
     groupIcon: "cluster-light",
     navLinks: [
       {
+        adminOnly: true,
         label: "LXD",
         url: urls.kvm.lxd.index,
       },
       {
+        adminOnly: true,
         label: "Virsh",
         url: urls.kvm.virsh.index,
       },
     ],
   },
   {
+    adminOnly: true,
     groupTitle: "Organisation",
     groupIcon: "tag",
     navLinks: [
       {
+        adminOnly: true,
         highlight: [urls.tags.index, urls.tags.tag.index(null)],
         label: "Tags",
         url: urls.tags.index,
       },
       {
+        adminOnly: true,
         highlight: [urls.zones.index],
         label: "AZs",
         url: urls.zones.index,
       },
       {
+        adminOnly: true,
         label: "Pools",
         url: urls.pools.index,
       },
     ],
   },
   {
+    adminOnly: true,
     groupTitle: "Configuration",
     groupIcon: "units",
     navLinks: [
       {
+        adminOnly: true,
         label: "Images",
         url: urls.images.index,
       },
     ],
   },
   {
+    adminOnly: true,
     groupTitle: "Networking",
     groupIcon: "connected",
     navLinks: [
@@ -88,11 +99,13 @@ const navGroups: NavGroup[] = [
         url: urls.subnets.index,
       },
       {
+        adminOnly: true,
         highlight: [urls.domains.index, urls.domains.details(null)],
         label: "DNS",
         url: urls.domains.index,
       },
       {
+        adminOnly: true,
         label: "Network discovery",
         url: urls.networkDiscovery.index,
       },

@@ -258,7 +258,7 @@
     "purple": #7764d8,
     "magenta": #974097,
     "red": #a71b33,
-    "cti": #2c6bc9,
+    "cti": #1742b1,
   );
   @each $name, $color in $nav-theme-colors {
     .is-maas-#{$name} {
@@ -268,7 +268,7 @@
 
   @each $name, $color in $nav-theme-colors {
     .is-maas-#{$name}--accent {
-      background-color: color.scale($color, $lightness: 5%) !important;
+      background-color: color.scale($color, $lightness: 6%) !important;
     }
   }
 }

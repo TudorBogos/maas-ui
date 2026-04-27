@@ -6,6 +6,7 @@ export type NavItem = {
 };
 
 export type NavGroup = {
+  adminOnly?: boolean;
   navLinks: NavItem[];
   groupTitle?: string;
   groupIcon?: string;

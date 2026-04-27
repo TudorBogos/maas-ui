@@ -42,7 +42,7 @@ const NavigationBanner = ({
           </Navigation.LogoIcon>
         </Navigation.LogoTag>
         <Navigation.LogoText>
-          <Navigation.LogoName variant="small">Canonical</Navigation.LogoName>
+          <Navigation.LogoName variant="small">CTI</Navigation.LogoName>
           <Navigation.LogoName>MAAS</Navigation.LogoName>
         </Navigation.LogoText>
       </Navigation.Logo>
