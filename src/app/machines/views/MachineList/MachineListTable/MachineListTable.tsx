@@ -220,7 +220,6 @@ export const MachineListTable = ({
             currentSort={currentSort}
             data-testid="owner-header"
             onClick={() => {
-              setShowFullName(false);
               updateSort(FetchGroupKey.Owner);
             }}
             sortKey={FetchGroupKey.Owner}
