@@ -13,7 +13,9 @@ import { getMeWithSummaryQueryKey } from "./apiclient/@tanstack/react-query.gen"
 import NavigationBanner from "./base/components/AppSideNavigation/NavigationBanner";
 import PageContent from "./base/components/PageContent/PageContent";
 import SectionHeader from "./base/components/SectionHeader";
-import ThemePreviewContextProvider from "./base/theme-context";
+import ThemePreviewContextProvider, {
+  DEFAULT_THEME,
+} from "./base/theme-context";
 import { MAAS_UI_ID } from "./constants";
 
 import { useGetCurrentUser } from "@/app/api/query/auth";
@@ -171,7 +173,7 @@ export const App = (): React.ReactElement => {
           <AppSideNavigation />
         ) : (
           <header className="l-navigation-bar is-pinned">
-            <div className="p-panel is-dark is-maas-default">
+            <div className={`p-panel is-dark is-maas-${DEFAULT_THEME}`}>
               <div className="p-panel__header">
                 <NavigationBanner />
               </div>

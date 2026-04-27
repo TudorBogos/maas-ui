@@ -5,13 +5,15 @@ import { useSelector } from "react-redux";
 
 import configSelectors from "@/app/store/config/selectors";
 
+export const DEFAULT_THEME = "cti";
+
 export type ThemeContextType = {
   theme: string;
   setTheme: (c: string) => void;
 };
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: "default",
+  theme: DEFAULT_THEME,
   setTheme: () => {},
 });
 
@@ -24,10 +26,10 @@ const ThemeContextProvider = ({
   children,
 }: PropsWithChildren<object>): React.ReactElement => {
   const maasTheme = useSelector(configSelectors.theme);
-  const [theme, setTheme] = useState(maasTheme ? maasTheme : "default");
+  const [theme, setTheme] = useState(maasTheme ? maasTheme : DEFAULT_THEME);
 
   useEffect(() => {
-    setTheme(maasTheme ? maasTheme : "default");
+    setTheme(maasTheme ? maasTheme : DEFAULT_THEME);
   }, [maasTheme]);
 
   return (

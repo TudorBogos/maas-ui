@@ -12,7 +12,7 @@ import { ColorValues } from "./ThemedRadioButton/ThemedRadioButton";
 import FormikField from "@/app/base/components/FormikField";
 import FormikForm from "@/app/base/components/FormikForm";
 import { useSendAnalytics } from "@/app/base/hooks";
-import { useThemeContext } from "@/app/base/theme-context";
+import { DEFAULT_THEME, useThemeContext } from "@/app/base/theme-context";
 import type { UsabillaLive } from "@/app/base/types";
 import { configActions } from "@/app/store/config";
 import configSelectors from "@/app/store/config/selectors";
@@ -59,7 +59,7 @@ const GeneralForm = (): React.ReactElement => {
   useEffect(() => {
     // revert to persisted theme value on unmount
     return () => {
-      setTheme(maasTheme ? maasTheme : "default");
+      setTheme(maasTheme ? maasTheme : DEFAULT_THEME);
     };
   }, [setTheme, maasTheme]);
 
@@ -82,14 +82,14 @@ const GeneralForm = (): React.ReactElement => {
       errors={errors}
       initialValues={{
         maas_name: maasName || "",
-        theme: maasTheme || ColorValues.Default,
+        theme: maasTheme || ColorValues.CTI,
         enable_analytics: analyticsEnabled || false,
         release_notifications: releaseNotifications || false,
       }}
       onCancel={(values, { resetForm }) => {
         resetForm();
-        setTheme(maasTheme ? maasTheme : "default");
-        values.theme = maasTheme ? maasTheme : "default";
+        setTheme(maasTheme ? maasTheme : DEFAULT_THEME);
+        values.theme = maasTheme ? maasTheme : DEFAULT_THEME;
       }}
       onSaveAnalytics={{
         action: "Saved",
@@ -143,9 +143,9 @@ const GeneralForm = (): React.ReactElement => {
       <p className="general-form__theme-label">MAAS theme main colour</p>
       <Row className="general-form__radio-row">
         {[
+          { value: ColorValues.CTI, label: "CTI" },
           { value: ColorValues.Default, label: "Default" },
           { value: ColorValues.Bark, label: "Bark" },
-          { value: ColorValues.CTI, label: "CTI" },
           { value: ColorValues.Olive, label: "Olive" },
           { value: ColorValues.Viridian, label: "Viridian" },
           { value: ColorValues.PrussianGreen, label: "Prussian green" },
