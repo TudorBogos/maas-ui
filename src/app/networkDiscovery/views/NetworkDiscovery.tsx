@@ -10,9 +10,7 @@ import DiscoveriesList from "./DiscoveriesList";
 import NetworkDiscoveryConfigurationForm from "./NetworkDiscoveryConfigurationForm";
 import NetworkDiscoveryHeader from "./NetworkDiscoveryHeader";
 
-import { useGetIsSuperUser } from "@/app/api/query/auth";
 import PageContent from "@/app/base/components/PageContent";
-import SectionHeader from "@/app/base/components/SectionHeader";
 import { getSidePanelTitle, useSidePanel } from "@/app/base/side-panel-context";
 import urls from "@/app/base/urls";
 import NotFound from "@/app/base/views/NotFound";
@@ -21,27 +19,15 @@ import { getRelativeRoute } from "@/app/utils";
 
 export enum Label {
   Disabled = "List of devices will not update as discovery is turned off.",
-  Permissions = "You do not have permission to view this page.",
 }
 
 const NetworkDiscovery = (): React.ReactElement => {
   const networkDiscovery = useSelector(configSelectors.networkDiscovery);
-  const isSuperUser = useGetIsSuperUser();
   const { sidePanelContent, setSidePanelContent } = useSidePanel();
 
   useEffect(() => {
     setSidePanelContent(null);
   }, [setSidePanelContent]);
-
-  if (!isSuperUser.data) {
-    return (
-      <PageContent
-        header={<SectionHeader title={Label.Permissions} />}
-        sidePanelContent={null}
-        sidePanelTitle={null}
-      />
-    );
-  }
 
   const base = urls.networkDiscovery.index;
   return (

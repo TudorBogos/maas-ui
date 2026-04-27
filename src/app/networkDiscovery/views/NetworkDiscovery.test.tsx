@@ -4,6 +4,9 @@ import { Labels as DiscoveriesListLabel } from "./DiscoveriesList/DiscoveriesLis
 import NetworkDiscovery, { Label } from "./NetworkDiscovery";
 import { Label as NetworkDiscoveryConfigurationFormLabel } from "./NetworkDiscoveryConfigurationForm/NetworkDiscoveryConfigurationForm";
 
+import SuperUserOnly, {
+  Label as SuperUserOnlyLabel,
+} from "@/app/base/components/SuperUserOnly";
 import urls from "@/app/base/urls";
 import { Label as NotFoundLabel } from "@/app/base/views/NotFound/NotFound";
 import { ConfigNames } from "@/app/store/config/types";
@@ -80,18 +83,25 @@ describe("NetworkDiscovery", () => {
     expect(screen.queryByText(Label.Disabled)).not.toBeInTheDocument();
   });
 
-  it("displays a message if not an admin", async () => {
+  it("displays a message if not an admin when guarded", async () => {
     mockServer.use(
       authResolvers.getCurrentUser.handler(
         factory.user({ is_superuser: false })
       )
     );
-    renderWithProviders(<NetworkDiscovery />, {
-      initialEntries: [urls.networkDiscovery.index],
-      state,
-    });
+    renderWithProviders(
+      <SuperUserOnly>
+        <NetworkDiscovery />
+      </SuperUserOnly>,
+      {
+        initialEntries: [urls.networkDiscovery.index],
+        state,
+      }
+    );
     await waitFor(() => {
-      expect(screen.getByText(Label.Permissions)).toBeInTheDocument();
+      expect(
+        screen.getByText(SuperUserOnlyLabel.Permissions)
+      ).toBeInTheDocument();
     });
   });
 });
