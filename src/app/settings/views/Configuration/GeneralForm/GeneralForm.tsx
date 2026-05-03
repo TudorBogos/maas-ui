@@ -145,11 +145,11 @@ const GeneralForm = (): React.ReactElement => {
         {[
           { value: ColorValues.CTI, label: "CTI" },
           { value: ColorValues.Default, label: "Default" },
+          { value: ColorValues.Sage, label: "Sage" },
           { value: ColorValues.Bark, label: "Bark" },
           { value: ColorValues.Olive, label: "Olive" },
           { value: ColorValues.Viridian, label: "Viridian" },
           { value: ColorValues.PrussianGreen, label: "Prussian green" },
-          { value: ColorValues.Blue, label: "Blue" },
           { value: ColorValues.Purple, label: "Purple" },
           { value: ColorValues.Magenta, label: "Magenta" },
           { value: ColorValues.Red, label: "Red" },
