@@ -1,0 +1,29 @@
+stages:
+  - check
+  - deploy
+
+check:
+  stage: check
+  tags:
+    - maas-check
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+  script:
+    - yarn install --frozen-lockfile
+    - yarn build
+
+deploy:
+  stage: deploy
+  tags:
+    - maas-deploy
+  resource_group: maas-ui-production
+  needs:
+    - check
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  script:
+    - yarn install --frozen-lockfile
+    - yarn build
+    - sudo /usr/bin/install -d -o www-data -g deploy -m 2774 /var/www/branded-ui/MAAS/r
+    - sudo /usr/bin/rsync -a --delete --chown=www-data:deploy --chmod=D2774,F0774 build/ /var/www/branded-ui/MAAS/r/
