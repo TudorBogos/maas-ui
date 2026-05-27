@@ -46,7 +46,7 @@ Add this sudoers entry with `visudo`, preferably as
 `/etc/sudoers.d/gitlab-runner-maas-ui`:
 
 ```sudoers
-gitlab-runner ALL=(root) NOPASSWD: /usr/bin/install -d -o www-data -g deploy -m 2774 /var/www/branded-ui/MAAS/r, /usr/bin/rsync -a --delete --chown=www-data\:deploy --chmod=D2774,F0774 build/ /var/www/branded-ui/MAAS/r/
+gitlab-runner ALL=(root) NOPASSWD: /usr/bin/install -d -o www-data -g deploy -m 2774 /var/www/branded-ui/MAAS/r, /usr/bin/rsync -a --delete --chown=www-data\:deploy --chmod=D2774\,F0774 build/ /var/www/branded-ui/MAAS/r/
 ```
 
 The CI deploy job uses explicit ownership and permission modes so deployment
