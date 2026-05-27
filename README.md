@@ -1,92 +1,123 @@
-## MAAS UI
+# CTI MAAS UI
 
-[![CI](https://github.com/canonical/maas-ui/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/canonical/maas-ui/actions/workflows/test.yml)
-[![Playwright Tests](https://github.com/canonical/maas-ui/actions/workflows/playwright.yml/badge.svg?branch=main)](https://github.com/canonical/maas-ui/actions/workflows/playwright.yml)
-[![Accessibility](https://github.com/canonical/maas-ui/actions/workflows/accessibility.yml/badge.svg?branch=main)](https://github.com/canonical/maas-ui/actions/workflows/accessibility.yml)
-[![Cypress](https://github.com/canonical/maas-ui/actions/workflows/cypress.yml/badge.svg?branch=main)](https://github.com/canonical/maas-ui/actions/workflows/cypress.yml)
-[![sitespeed.io](https://github.com/canonical/maas-ui/actions/workflows/sitespeed.yml/badge.svg?branch=main)](https://github.com/canonical/maas-ui/actions/workflows/sitespeed.yml)
-[![MAAS Docs link checker](https://github.com/canonical/maas-ui/actions/workflows/links-checker.yml/badge.svg?branch=main)](https://github.com/canonical/maas-ui/actions/workflows/links-checker.yml)
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-[![Code Coverage](https://img.shields.io/badge/code--coverage-report-brightgreen.svg)](https://canonical.github.io/maas-ui/)
-[![Build upload](https://github.com/canonical/maas-ui/actions/workflows/upload.yml/badge.svg)](https://github.com/canonical/maas-ui/actions/workflows/upload.yml)
+CTI MAAS UI is a branded fork of Canonical's `maas-ui` for the CTI MAAS
+deployment. The upstream project documentation is preserved in
+[CANONICAL_README.md](CANONICAL_README.md).
 
-- [About](#about)
-- [MAAS UI Overview](#maas-ui-overview)
-- [Contributing](#contributing)
-- [Feedback](#feedback)
-- [Integration testing](#integration-testing)
-- [Release Process](#release-process)
-- [Related Projects](#related-projects)
-- [Built With](#built-with)
-- [Team Members](#team-members)
-- [Code of Conduct](#code-of-conduct)
-- [License](#license)
+This repository builds the static MAAS web UI served from:
 
-## About
+```text
+/MAAS/r/
+```
 
-MAAS is an open-source tool that lets you build a data centre from bare-metal servers. You can discover, commission, deploy, and dynamically reconfigure a large network of individual units.
+The production build output is copied to:
 
-![screenshot of MAAS UI displaying 1000 machines](https://user-images.githubusercontent.com/7452681/234197707-a25b2231-1ca4-4d80-9e42-53d99c4e2cf1.png)
+```text
+/var/www/branded-ui/MAAS/r
+```
 
-This repository contains the sourcecode for the [MAAS](https://maas.io) web app, maas-ui.
+## Changes From Canonical MAAS UI
 
-## MAAS UI Overview
+This fork is based on Canonical MAAS UI 3.7. In this repository, "original"
+means the upstream 3.7 codebase before the CTI branded UI changes, represented
+locally by commit `249358946`.
 
-[MAAS UI Overview](docs/MAASUI.md)
+Fork-specific changes:
 
-## Contributing
+- Added the CTI theme color and made CTI the default theme.
+- Removed the status bar from the app shell.
+- Hid admin-only navigation entries from non-admin users.
+- Added a `SuperUserOnly` guard for protected MAAS routes.
+- Changed the user details page so superusers get the editable user form, while
+  non-superusers see read-only username and email details.
+- Removed the owner full-name column toggle from the machine list.
+- Adjusted secondary navigation height after removing the status bar.
+- Added Git remote setup documentation in [git.md](git.md).
 
-Community contributions are most welcome, and there are a number of ways to participate:
+## Build
 
-- [Submit bugs and feature requests](https://maas.io/docs/how-to-review-and-report-bugs)
-- [Assist with code review](https://github.com/canonical/maas-ui/pulls)
-- [Submit bugs for the MAAS website](https://github.com/canonical/maas.io)
-- [Contribute to MAAS documentation](https://maas.io/docs/how-to-contribute-to-maas-documentation)
+Prerequisites:
 
-When submitting a PR, please take note that MAAS UI uses the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) format. To help you conform to this, you can run `yarn commit` instead of `git commit` for an interactive prompt.
+- Node.js `v20`
+- Yarn
+- Git
 
-Please see [HACKING](/docs/HACKING.md) for details on setting up a MAAS UI development environment.
+Install dependencies and build:
 
-## Feedback
+```bash
+yarn install --frozen-lockfile
+yarn build
+```
 
-- Ask a question about MAAS on [Discourse](https://discourse.maas.io/).
-- File a [MAAS issue](https://bugs.launchpad.net/maas/+filebug).
-  - If you think that the issue is related to the UI, please add a `ui` tag
+The build output is written to `build/`. The package is configured for the
+`/MAAS/r/` base path.
 
-## Integration testing
+## Deployment
 
-[Integration testing](docs/INTEGRATION.md)
+Production deployment mirrors the contents of `build/` into:
 
-## Release Process
+```text
+/var/www/branded-ui/MAAS/r
+```
 
-[Release Process](docs/RELEASE.md)
+The deployed files should be owned by `www-data:deploy`. Directory permissions
+should be `2774` so the setgid bit keeps new files in the `deploy` group. File
+permissions should be `0774`.
 
-## Related Projects
+The deployment is intentionally mirror-style: files that no longer exist in the
+new `build/` output are removed from the web root so stale hashed assets do not
+remain deployed.
 
-### MAAS
+### Manual Deployment
 
-MAAS server source and issue tracking [can be found on Launchpad](https://launchpad.net/maas).
+Run from the repository root:
 
-### LXD
+```bash
+yarn install --frozen-lockfile
+yarn build
+sudo /usr/bin/install -d -o www-data -g deploy -m 2774 /var/www/branded-ui/MAAS/r
+sudo /usr/bin/rsync -a --delete --chown=www-data:deploy --chmod=D2774,F0774 build/ /var/www/branded-ui/MAAS/r/
+```
 
-[LXD](https://github.com/lxc/lxd) is a next generation system container and virtual machine manager, used extensively by MAAS.
+## GitLab CI Prerequisites
 
-## Built With
+Production CI is expected to run on a shell GitLab Runner installed on the web
+host that serves `/var/www/branded-ui/MAAS/r`.
 
-- [React](https://reactjs.org/)
-- [Redux](https://redux.js.org/)
-- [TypeScript](https://www.typescriptlang.org/)
+Host prerequisites:
 
-## Team Members
+- Node.js `v20`
+- Yarn
+- Git
+- rsync
+- A `deploy` group
+- A `gitlab-runner` user that belongs to `deploy`
+- GitLab Runner tags matching the pipeline jobs:
+  - `maas-check`
+  - `maas-deploy`
 
-[MAAS Tribe](https://discourse.canonical.com/t/maas-tribe/272) and [Canonical Web & Design](https://github.com/orgs/canonical/teams/web-and-design/members)
+One-time host setup, if the group membership is not already configured:
 
-## Code of Conduct
+```bash
+sudo groupadd --system deploy
+sudo usermod -aG deploy gitlab-runner
+```
 
-This project adopts the [Ubuntu Code of Conduct](https://ubuntu.com/community/code-of-conduct).
+If `deploy` already exists, only ensure `gitlab-runner` is a member:
 
-## License
+```bash
+sudo usermod -aG deploy gitlab-runner
+```
 
-Code licensed AGPLv3 by Canonical Ltd.
+## Sudoers
 
-With ♥ from Canonical
+Add this sudoers entry with `visudo`, preferably as
+`/etc/sudoers.d/gitlab-runner-maas-ui`:
+
+```sudoers
+gitlab-runner ALL=(root) NOPASSWD: /usr/bin/install -d -o www-data -g deploy -m 2774 /var/www/branded-ui/MAAS/r, /usr/bin/rsync -a --delete --chown=www-data\:deploy --chmod=D2774,F0774 build/ /var/www/branded-ui/MAAS/r/
+```
+
+The CI deploy job should use the same commands as the manual deployment. The
+explicit modes make the deployed ownership and permissions predictable without
+requiring a deployment `umask`.
