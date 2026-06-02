@@ -4,16 +4,20 @@ import { ContentSection } from "@canonical/maas-react-components";
 import { Col, Notification, Row, Spinner } from "@canonical/react-components";
 import { useSelector } from "react-redux";
 
+import RestrictedDetails, {
+  Label as RestrictedDetailsLabel,
+} from "./RestrictedDetails";
+
 import { useGetCurrentUser } from "@/app/api/query/auth";
 import { useWindowTitle } from "@/app/base/hooks";
 import { EditUser } from "@/app/settings/views/Users/components";
 import statusSelectors from "@/app/store/status/selectors";
 
 export enum Label {
-  Email = "Email address",
-  NoEmail = "No email",
+  Email = RestrictedDetailsLabel.Email,
+  NoEmail = RestrictedDetailsLabel.NoEmail,
   Title = "Details",
-  Username = "Username",
+  Username = RestrictedDetailsLabel.Username,
 }
 
 export const Details = (): ReactElement => {
@@ -39,12 +43,7 @@ export const Details = (): ReactElement => {
               <EditUser id={user.data.id} isSelfEditing={true} />
             )}
             {user.isSuccess && user.data?.is_superuser === false && (
-              <dl>
-                <dt>{Label.Username}</dt>
-                <dd>{user.data.username}</dd>
-                <dt>{Label.Email}</dt>
-                <dd>{user.data.email || Label.NoEmail}</dd>
-              </dl>
+              <RestrictedDetails user={user.data} />
             )}
           </Col>
         </Row>
