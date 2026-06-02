@@ -448,3 +448,42 @@ export const generateRestrictedGroupRows = ({
   });
   return rows;
 };
+
+export const generateRestrictedRowsFromStatusGroups = ({
+  callId,
+  groups,
+  machines,
+  hiddenColumns,
+  ...rowProps
+}: GroupRowsProps): MainTableRow[] => {
+  let rows: MainTableRow[] = [];
+
+  groups?.forEach((group) => {
+    const { collapsed, items: machineIDs } = group;
+    const visibleMachines = collapsed
+      ? []
+      : machineIDs.reduce<Machine[]>((groupMachines, systemId) => {
+          const machine = machines.find(
+            ({ system_id }) => system_id === systemId
+          );
+          if (machine) {
+            groupMachines.push(machine);
+          }
+          return groupMachines;
+        }, []);
+
+    rows = rows.concat(
+      generateRows({
+        ...rowProps,
+        callId,
+        groupValue: group.value,
+        machines: visibleMachines,
+        selectionMode: "single",
+        showActions: true,
+        hiddenColumns,
+      })
+    );
+  });
+
+  return rows;
+};

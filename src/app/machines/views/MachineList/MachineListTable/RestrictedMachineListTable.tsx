@@ -5,7 +5,7 @@ import classNames from "classnames";
 
 import {
   filterColumns,
-  generateRestrictedGroupRows,
+  generateRestrictedRowsFromStatusGroups,
   generateSkeletonRows,
 } from "./tableModels";
 import type { MachineListTableProps } from "./types";
@@ -13,15 +13,12 @@ import type { MachineListTableProps } from "./types";
 import TableHeader from "@/app/base/components/TableHeader";
 import { useFetchActions, useSendAnalytics } from "@/app/base/hooks";
 import { SortDirection } from "@/app/base/types";
-import {
-  columnLabels,
-  groupOptions,
-  MachineColumns,
-} from "@/app/machines/constants";
+import { columnLabels, MachineColumns } from "@/app/machines/constants";
 import { generalActions } from "@/app/store/general";
 import { FetchGroupKey } from "@/app/store/machine/types";
 import { FilterMachines } from "@/app/store/machine/utils";
 import { tagActions } from "@/app/store/tag";
+import { FetchNodeStatus } from "@/app/store/types/node";
 import { generateEmptyStateMsg, getTableStatus } from "@/app/utils";
 
 enum Label {
@@ -35,7 +32,6 @@ export const RestrictedMachineListTable = ({
   callId,
   filter = "",
   groups,
-  grouping,
   hiddenColumns = [],
   hiddenGroups = [],
   machines,
@@ -330,10 +326,30 @@ export const RestrictedMachineListTable = ({
     },
   ];
 
-  // Later user-only filtering, e.g. hiding Ready rows, should be applied here.
-  const rows = generateRestrictedGroupRows({
-    grouping,
-    groups,
+  const restrictedGroups = useMemo(() => {
+    const activeMachineStatuses = [
+      FetchNodeStatus.ALLOCATED,
+      FetchNodeStatus.DEPLOYED,
+      FetchNodeStatus.DEPLOYING,
+    ];
+    const hasActiveMachine = groups?.some(
+      ({ count, items, value }) =>
+        activeMachineStatuses.includes(value as FetchNodeStatus) &&
+        ((count ?? 0) > 0 || items.length > 0)
+    );
+
+    if (!hasActiveMachine) {
+      return groups;
+    }
+
+    return (
+      groups?.filter(({ value }) => value !== FetchNodeStatus.READY) ?? null
+    );
+  }, [groups]);
+
+  const rows = generateRestrictedRowsFromStatusGroups({
+    grouping: null,
+    groups: restrictedGroups,
     hiddenGroups,
     machines,
     setHiddenGroups,
@@ -347,11 +363,6 @@ export const RestrictedMachineListTable = ({
     [hiddenColumns, showActions]
   );
 
-  const groupByStatus = useMemo(
-    () => groupOptions.find(({ value }) => value === grouping)?.label ?? "",
-    [grouping]
-  );
-
   const tableStatus = getTableStatus({
     isLoading: !!machinesLoading,
     hasFilter: !!filter,
@@ -362,13 +373,8 @@ export const RestrictedMachineListTable = ({
       <hr />
       <MainTable
         aria-describedby="machine-list-description"
-        aria-label={
-          machinesLoading
-            ? Label.Loading
-            : `${Label.Machines} - ${groupByStatus}`
-        }
+        aria-label={machinesLoading ? Label.Loading : Label.Machines}
         className={classNames("p-table-expanding--light", "machine-list", {
-          "machine-list--grouped": grouping,
           "machine-list--loading": machinesLoading,
         })}
         emptyStateMsg={generateEmptyStateMsg(tableStatus, {
