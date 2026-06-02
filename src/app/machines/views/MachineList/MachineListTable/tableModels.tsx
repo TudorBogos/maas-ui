@@ -241,6 +241,7 @@ export const generateRows = ({
   hiddenColumns,
   machines,
   getToggleHandler,
+  selectionMode,
   showActions,
   showMAC,
 }: GenerateRowParams): RowReturnType[] => {
@@ -255,6 +256,7 @@ export const generateRows = ({
           data-testid="fqdn-column"
           groupValue={groupValue}
           machines={machines}
+          selectionMode={selectionMode}
           showActions={showActions}
           showMAC={showMAC}
           systemId={row.system_id}
@@ -377,6 +379,69 @@ export const generateGroupRows = ({
         groupValue: group.value,
         machines: visibleMachines,
         showActions,
+        hiddenColumns,
+      })
+    );
+  });
+  return rows;
+};
+
+export const generateRestrictedGroupRows = ({
+  callId,
+  grouping,
+  groups,
+  hiddenGroups,
+  machines,
+  setHiddenGroups,
+  hiddenColumns,
+  filter,
+  ...rowProps
+}: GroupRowsProps): MainTableRow[] => {
+  let rows: MainTableRow[] = [];
+
+  groups?.forEach((group) => {
+    const { collapsed, items: machineIDs, name } = group;
+    if (grouping) {
+      rows.push({
+        "aria-label": `${name} machines group`,
+        className: "machine-list__group",
+        columns: [
+          {
+            colSpan: columns.length - hiddenColumns.length,
+            content: (
+              <GroupColumn
+                filter={filter}
+                group={group}
+                grouping={grouping}
+                hiddenGroups={hiddenGroups}
+                setHiddenGroups={setHiddenGroups}
+                showActions={false}
+              />
+            ),
+          },
+        ],
+      });
+    }
+
+    const visibleMachines = collapsed
+      ? []
+      : machineIDs.reduce<Machine[]>((groupMachines, systemId) => {
+          const machine = machines.find(
+            ({ system_id }) => system_id === systemId
+          );
+          if (machine) {
+            groupMachines.push(machine);
+          }
+          return groupMachines;
+        }, []);
+    rows = rows.concat(
+      generateRows({
+        ...rowProps,
+        callId,
+        groupValue: group.value,
+        machines: visibleMachines,
+        selectionMode: "single",
+        showActions: true,
         hiddenColumns,
       })
     );

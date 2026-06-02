@@ -54,6 +54,7 @@ export type GenerateRowParams = {
   hiddenColumns: NonNullable<MachineListTableProps["hiddenColumns"]>;
   machines: Machine[];
   getToggleHandler: GetMachineMenuToggleHandler;
+  selectionMode?: "multiple" | "single";
   showActions: MachineListTableProps["showActions"];
   showMAC: boolean;
   showFullName: boolean;
