@@ -103,6 +103,7 @@ const Machines = (): React.ReactElement => {
       sidePanelContent={
         sidePanelContent && (
           <MachineForms
+            isRestricted={isRestricted}
             searchFilter={isRestricted ? "" : searchFilter}
             selectedCount={selectedCount}
             selectedCountLoading={selectedCountLoading}

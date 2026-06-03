@@ -46,6 +46,7 @@ import { NetworkInterfaceTypes } from "@/app/store/types/enum";
 
 type Props = MachineActionVariableProps &
   SidePanelContentTypes & {
+    isRestricted?: boolean;
     setSearchFilter?: SetSearchFilter;
     viewingDetails?: boolean;
   };
@@ -53,6 +54,7 @@ type Props = MachineActionVariableProps &
 /* eslint-disable complexity */
 export const MachineForms = ({
   sidePanelContent,
+  isRestricted = false,
   machines,
   setSidePanelContent,
   selectedCountLoading,
@@ -418,6 +420,7 @@ export const MachineForms = ({
           applyConfiguredNetworking={applyConfiguredNetworking}
           clearSidePanelContent={clearSidePanelContent}
           hardwareType={hardwareType}
+          isRestricted={isRestricted}
           setSearchFilter={setSearchFilter}
           viewingDetails={viewingDetails}
           {...conditionalProps}

@@ -10,6 +10,7 @@ import DeployForm from "./DeployForm";
 import MarkBrokenForm from "./MarkBrokenForm";
 import OverrideTestForm from "./OverrideTestForm";
 import ReleaseForm from "./ReleaseForm";
+import RestrictedReleaseForm from "./ReleaseForm/RestrictedReleaseForm";
 import SetPoolForm from "./SetPoolForm";
 import TagForm from "./TagForm";
 
@@ -38,6 +39,7 @@ type ContainerProps = Omit<MachineActionFormProps, "processingCount"> & {
   applyConfiguredNetworking?: boolean;
   clearSidePanelContent: ClearSidePanelContent;
   hardwareType?: HardwareType;
+  isRestricted?: boolean;
   selectedCountLoading?: boolean;
   setSearchFilter?: SetSearchFilter;
   viewingDetails: boolean;
@@ -68,6 +70,7 @@ export const MachineActionForm = ({
   dispatchForSelectedMachines,
   filter,
   hardwareType,
+  isRestricted = false,
   onRenderRef,
   searchFilter,
   selectedCount,
@@ -133,7 +136,12 @@ export const MachineActionForm = ({
     [NodeActions.OVERRIDE_FAILED_TESTING]: () => (
       <OverrideTestForm {...commonMachineFormProps} />
     ),
-    [NodeActions.RELEASE]: () => <ReleaseForm {...commonMachineFormProps} />,
+    [NodeActions.RELEASE]: () =>
+      isRestricted ? (
+        <RestrictedReleaseForm {...commonMachineFormProps} />
+      ) : (
+        <ReleaseForm {...commonMachineFormProps} />
+      ),
     [NodeActions.SET_POOL]: () => <SetPoolForm {...commonMachineFormProps} />,
     [NodeActions.SET_ZONE]: () => (
       <SetZoneForm<MachineEventErrors>
@@ -271,6 +279,7 @@ export const MachineActionFormWrapper = ({
   applyConfiguredNetworking,
   clearSidePanelContent,
   hardwareType,
+  isRestricted = false,
   searchFilter,
   selectedCount,
   selectedCountLoading,
@@ -305,6 +314,7 @@ export const MachineActionFormWrapper = ({
       dispatchForSelectedMachines={dispatchForSelectedMachines}
       filter={filter}
       hardwareType={hardwareType}
+      isRestricted={isRestricted}
       onRenderRef={onRenderRef}
       searchFilter={searchFilter}
       selectedCount={selectedCount}
