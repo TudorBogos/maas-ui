@@ -11,6 +11,7 @@ import PoolColumn from "./PoolColumn";
 import PowerColumn from "./PowerColumn";
 import RamColumn from "./RamColumn";
 import StatusColumn from "./StatusColumn";
+import RestrictedStatusColumn from "./StatusColumn/RestrictedStatusColumn";
 import StorageColumn from "./StorageColumn";
 import ZoneColumn from "./ZoneColumn";
 import type {
@@ -241,6 +242,7 @@ export const generateRows = ({
   hiddenColumns,
   machines,
   getToggleHandler,
+  selectionMode,
   showActions,
   showMAC,
 }: GenerateRowParams): RowReturnType[] => {
@@ -255,6 +257,7 @@ export const generateRows = ({
           data-testid="fqdn-column"
           groupValue={groupValue}
           machines={machines}
+          selectionMode={selectionMode}
           showActions={showActions}
           showMAC={showMAC}
           systemId={row.system_id}
@@ -269,6 +272,93 @@ export const generateRows = ({
       ),
       [MachineColumns.STATUS]: (
         <StatusColumn
+          data-testid="status-column"
+          onToggleMenu={getMenuHandler(MachineColumns.STATUS)}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.OWNER]: (
+        <OwnerColumn
+          data-testid="owner-column"
+          onToggleMenu={getMenuHandler(MachineColumns.OWNER)}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.POOL]: (
+        <PoolColumn
+          data-testid="pool-column"
+          onToggleMenu={getMenuHandler(MachineColumns.POOL)}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.ZONE]: (
+        <ZoneColumn
+          data-testid="zone-column"
+          onToggleMenu={getMenuHandler(MachineColumns.ZONE)}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.FABRIC]: (
+        <FabricColumn data-testid="fabric-column" systemId={row.system_id} />
+      ),
+      [MachineColumns.CPU]: (
+        <CoresColumn data-testid="cpu-column" systemId={row.system_id} />
+      ),
+      [MachineColumns.MEMORY]: (
+        <RamColumn data-testid="memory-column" systemId={row.system_id} />
+      ),
+      [MachineColumns.DISKS]: (
+        <DisksColumn data-testid="disks-column" systemId={row.system_id} />
+      ),
+      [MachineColumns.STORAGE]: (
+        <StorageColumn data-testid="storage-column" systemId={row.system_id} />
+      ),
+    };
+    return generateRow({
+      key: row.system_id,
+      content,
+      hiddenColumns,
+      showActions,
+    });
+  });
+};
+
+const generateRestrictedRows = ({
+  callId,
+  groupValue,
+  hiddenColumns,
+  machines,
+  getToggleHandler,
+  selectionMode,
+  showActions,
+  showMAC,
+}: GenerateRowParams): RowReturnType[] => {
+  const getMenuHandler: GetMachineMenuToggleHandler = (...args) =>
+    showActions ? getToggleHandler(...args) : () => undefined;
+
+  return machines.map((row) => {
+    const content = {
+      [MachineColumns.FQDN]: (
+        <NameColumn
+          callId={callId}
+          data-testid="fqdn-column"
+          groupValue={groupValue}
+          machines={machines}
+          selectionMode={selectionMode}
+          showActions={showActions}
+          showMAC={showMAC}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.POWER]: (
+        <PowerColumn
+          data-testid="power-column"
+          onToggleMenu={getMenuHandler(MachineColumns.POWER)}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.STATUS]: (
+        <RestrictedStatusColumn
           data-testid="status-column"
           onToggleMenu={getMenuHandler(MachineColumns.STATUS)}
           systemId={row.system_id}
@@ -381,5 +471,107 @@ export const generateGroupRows = ({
       })
     );
   });
+  return rows;
+};
+
+export const generateRestrictedGroupRows = ({
+  callId,
+  grouping,
+  groups,
+  hiddenGroups,
+  machines,
+  setHiddenGroups,
+  hiddenColumns,
+  filter,
+  ...rowProps
+}: GroupRowsProps): MainTableRow[] => {
+  let rows: MainTableRow[] = [];
+
+  groups?.forEach((group) => {
+    const { collapsed, items: machineIDs, name } = group;
+    if (grouping) {
+      rows.push({
+        "aria-label": `${name} machines group`,
+        className: "machine-list__group",
+        columns: [
+          {
+            colSpan: columns.length - hiddenColumns.length,
+            content: (
+              <GroupColumn
+                filter={filter}
+                group={group}
+                grouping={grouping}
+                hiddenGroups={hiddenGroups}
+                setHiddenGroups={setHiddenGroups}
+                showActions={false}
+              />
+            ),
+          },
+        ],
+      });
+    }
+
+    const visibleMachines = collapsed
+      ? []
+      : machineIDs.reduce<Machine[]>((groupMachines, systemId) => {
+          const machine = machines.find(
+            ({ system_id }) => system_id === systemId
+          );
+          if (machine) {
+            groupMachines.push(machine);
+          }
+          return groupMachines;
+        }, []);
+    rows = rows.concat(
+      generateRestrictedRows({
+        ...rowProps,
+        callId,
+        groupValue: group.value,
+        machines: visibleMachines,
+        selectionMode: "single",
+        showActions: true,
+        hiddenColumns,
+      })
+    );
+  });
+  return rows;
+};
+
+export const generateRestrictedRowsFromStatusGroups = ({
+  callId,
+  groups,
+  machines,
+  hiddenColumns,
+  ...rowProps
+}: GroupRowsProps): MainTableRow[] => {
+  let rows: MainTableRow[] = [];
+
+  groups?.forEach((group) => {
+    const { collapsed, items: machineIDs } = group;
+    const visibleMachines = collapsed
+      ? []
+      : machineIDs.reduce<Machine[]>((groupMachines, systemId) => {
+          const machine = machines.find(
+            ({ system_id }) => system_id === systemId
+          );
+          if (machine) {
+            groupMachines.push(machine);
+          }
+          return groupMachines;
+        }, []);
+
+    rows = rows.concat(
+      generateRestrictedRows({
+        ...rowProps,
+        callId,
+        groupValue: group.value,
+        machines: visibleMachines,
+        selectionMode: "single",
+        showActions: true,
+        hiddenColumns,
+      })
+    );
+  });
+
   return rows;
 };

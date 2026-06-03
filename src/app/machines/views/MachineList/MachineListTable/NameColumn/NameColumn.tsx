@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 
-import MachineCheckbox from "../MachineCheckbox";
+import MachineCheckbox, { RestrictedMachineCheckbox } from "../MachineCheckbox";
 
 import DoubleRow from "@/app/base/components/DoubleRow";
 import MacAddressDisplay from "@/app/base/components/MacAddressDisplay";
@@ -22,6 +22,7 @@ import type { RootState } from "@/app/store/root/types";
 type Props = {
   callId?: string | null;
   groupValue: MachineStateListGroup["value"];
+  selectionMode?: "multiple" | "single";
   showActions?: boolean;
   showMAC?: boolean;
   systemId: Machine[MachineMeta.PK];
@@ -127,6 +128,7 @@ const generateMAC = (machine: Machine, machineURL: string) => {
 export const NameColumn = ({
   callId,
   groupValue,
+  selectionMode = "multiple",
   showActions,
   showMAC,
   systemId,
@@ -148,7 +150,13 @@ export const NameColumn = ({
     <DoubleRow
       data-testid="name-column"
       primary={
-        showActions ? (
+        showActions && selectionMode === "single" ? (
+          <RestrictedMachineCheckbox
+            callId={callId}
+            label={primaryRow}
+            systemId={systemId}
+          />
+        ) : showActions ? (
           <MachineCheckbox
             callId={callId}
             groupValue={groupValue}

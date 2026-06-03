@@ -1,67 +1,47 @@
-import { useMemo, memo, useCallback, useState } from "react";
+import { useMemo, useCallback, useState, memo } from "react";
 
 import { MainTable } from "@canonical/react-components";
 import classNames from "classnames";
 
-import AllCheckbox from "./AllCheckbox";
-import MachineListPagination from "./MachineListPagination";
-import MachineListSelectedCount from "./MachineListSelectedCount/MachineListSelectedCount";
-import PageSizeSelect from "./PageSizeSelect";
-import RestrictedMachineListTable from "./RestrictedMachineListTable";
 import {
   filterColumns,
+  generateRestrictedRowsFromStatusGroups,
   generateSkeletonRows,
-  generateGroupRows,
 } from "./tableModels";
 import type { MachineListTableProps } from "./types";
 
-import { useGetIsSuperUser } from "@/app/api/query/auth";
-import ListDisplayCount from "@/app/base/components/ListDisplayCount";
 import TableHeader from "@/app/base/components/TableHeader";
 import { useFetchActions, useSendAnalytics } from "@/app/base/hooks";
 import { SortDirection } from "@/app/base/types";
-import {
-  columnLabels,
-  columns,
-  MachineColumns,
-  groupOptions,
-} from "@/app/machines/constants";
+import { columnLabels, MachineColumns } from "@/app/machines/constants";
 import { generalActions } from "@/app/store/general";
 import { FetchGroupKey } from "@/app/store/machine/types";
 import { FilterMachines } from "@/app/store/machine/utils";
-import { useMachineSelectedCount } from "@/app/store/machine/utils/hooks";
 import { tagActions } from "@/app/store/tag";
+import { FetchNodeStatus } from "@/app/store/types/node";
 import { generateEmptyStateMsg, getTableStatus } from "@/app/utils";
 
-export enum Label {
+enum Label {
   EmptyList = "No machines available.",
   Loading = "Loading machines",
   Machines = "Machines",
   NoResults = "No machines match the search criteria.",
 }
 
-const AdminMachineListTable = ({
+export const RestrictedMachineListTable = ({
   callId,
-  currentPage,
-  totalPages,
   filter = "",
   groups,
-  grouping,
   hiddenColumns = [],
   hiddenGroups = [],
-  machineCount,
   machines,
   machinesLoading,
-  pageSize,
-  setCurrentPage,
   setHiddenGroups,
-  setPageSize,
   showActions = true,
   sortDirection,
   sortKey,
   setSortDirection,
   setSortKey,
-  ...props
 }: MachineListTableProps): React.ReactElement => {
   const parsedFilter = useMemo(
     () => FilterMachines.parseFetchFilters(filter),
@@ -69,7 +49,6 @@ const AdminMachineListTable = ({
   );
 
   const sendAnalytics = useSendAnalytics();
-  const { selectedCount } = useMachineSelectedCount(parsedFilter);
 
   const currentSort = {
     direction: sortDirection,
@@ -138,19 +117,10 @@ const AdminMachineListTable = ({
       className: "fqdn-col",
       content: (
         <div className="u-flex">
-          {showActions && (
-            <AllCheckbox
-              callId={callId}
-              data-testid="all-machines-checkbox"
-              filter={parsedFilter}
-            />
-          )}
           <div>
             <TableHeader
               currentSort={currentSort}
               data-testid="fqdn-header"
-              // TODO: change this to "fqdn" when the API supports it:
-              // https://github.com/canonical/app-tribe/issues/1268
               onClick={() => {
                 setShowMAC(false);
                 updateSort(FetchGroupKey.Hostname);
@@ -163,8 +133,6 @@ const AdminMachineListTable = ({
             <TableHeader
               currentSort={currentSort}
               data-testid="mac-header"
-              // TODO: enable sorting by "pxe_mac" when the API supports it:
-              // https://github.com/canonical/app-tribe/issues/1268
               onClick={() => {
                 setShowMAC(true);
               }}
@@ -278,12 +246,7 @@ const AdminMachineListTable = ({
       className: "fabric-col",
       content: (
         <>
-          <TableHeader
-            currentSort={currentSort}
-            data-testid="fabric-header"
-            // TODO: enable sorting by "fabric" when the API supports it:
-            // https://github.com/canonical/app-tribe/issues/1268
-          >
+          <TableHeader currentSort={currentSort} data-testid="fabric-header">
             {columnLabels[MachineColumns.FABRIC]}
           </TableHeader>
           <TableHeader>VLAN</TableHeader>
@@ -363,9 +326,30 @@ const AdminMachineListTable = ({
     },
   ];
 
-  const rows = generateGroupRows({
-    grouping,
-    groups,
+  const restrictedGroups = useMemo(() => {
+    const activeMachineStatuses = [
+      FetchNodeStatus.ALLOCATED,
+      FetchNodeStatus.DEPLOYED,
+      FetchNodeStatus.DEPLOYING,
+    ];
+    const hasActiveMachine = groups?.some(
+      ({ count, items, value }) =>
+        activeMachineStatuses.includes(value as FetchNodeStatus) &&
+        ((count ?? 0) > 0 || items.length > 0)
+    );
+
+    if (!hasActiveMachine) {
+      return groups;
+    }
+
+    return (
+      groups?.filter(({ value }) => value !== FetchNodeStatus.READY) ?? null
+    );
+  }, [groups]);
+
+  const rows = generateRestrictedRowsFromStatusGroups({
+    grouping: null,
+    groups: restrictedGroups,
     hiddenGroups,
     machines,
     setHiddenGroups,
@@ -379,41 +363,6 @@ const AdminMachineListTable = ({
     [hiddenColumns, showActions]
   );
 
-  const selectionState = useMemo(() => {
-    if (selectedCount > 0) {
-      return [
-        {
-          className: "select-notification",
-          key: "select-info",
-          columns: [
-            {
-              colSpan: columns.length - hiddenColumns.length,
-              content: (
-                <MachineListSelectedCount
-                  filter={filter}
-                  machineCount={machineCount}
-                  selectedCount={selectedCount}
-                />
-              ),
-            },
-          ],
-        },
-      ];
-    } else {
-      return [];
-    }
-  }, [filter, hiddenColumns.length, machineCount, selectedCount]);
-
-  const machineRows = useMemo(
-    () => [...selectionState, ...rows],
-    [rows, selectionState]
-  );
-
-  const groupByStatus = useMemo(
-    () => groupOptions.find(({ value }) => value === grouping)?.label ?? "",
-    [grouping]
-  );
-
   const tableStatus = getTableStatus({
     isLoading: !!machinesLoading,
     hasFilter: !!filter,
@@ -421,44 +370,11 @@ const AdminMachineListTable = ({
 
   return (
     <>
-      {machineCount ? (
-        <div className="u-flex--between u-flex--align-baseline u-flex--wrap">
-          <hr />
-          <ListDisplayCount
-            count={machineCount}
-            currentPage={currentPage}
-            pageSize={pageSize}
-            type="machine"
-          />
-          <span className="u-flex--end">
-            <MachineListPagination
-              currentPage={currentPage}
-              itemsPerPage={pageSize}
-              machineCount={machineCount}
-              machinesLoading={machinesLoading}
-              paginate={setCurrentPage}
-              totalPages={totalPages}
-            />
-            {setPageSize ? (
-              <PageSizeSelect
-                pageSize={pageSize}
-                paginate={setCurrentPage}
-                setPageSize={setPageSize}
-              />
-            ) : null}
-          </span>
-        </div>
-      ) : null}
       <hr />
       <MainTable
         aria-describedby="machine-list-description"
-        aria-label={
-          machinesLoading
-            ? Label.Loading
-            : `${Label.Machines} - ${groupByStatus}`
-        }
+        aria-label={machinesLoading ? Label.Loading : Label.Machines}
         className={classNames("p-table-expanding--light", "machine-list", {
-          "machine-list--grouped": grouping,
           "machine-list--loading": machinesLoading,
         })}
         emptyStateMsg={generateEmptyStateMsg(tableStatus, {
@@ -466,23 +382,10 @@ const AdminMachineListTable = ({
           filtered: Label.NoResults,
         })}
         headers={filterColumns(headers, hiddenColumns, showActions)}
-        rows={machinesLoading ? skeletonRows : machineRows}
-        {...props}
+        rows={machinesLoading ? skeletonRows : rows}
       />
     </>
   );
 };
 
-export const MachineListTable = (
-  props: MachineListTableProps
-): React.ReactElement => {
-  const isSuperUser = useGetIsSuperUser();
-
-  if (isSuperUser.data === false) {
-    return <RestrictedMachineListTable {...props} />;
-  }
-
-  return <AdminMachineListTable {...props} />;
-};
-
-export default memo(MachineListTable);
+export default memo(RestrictedMachineListTable);
