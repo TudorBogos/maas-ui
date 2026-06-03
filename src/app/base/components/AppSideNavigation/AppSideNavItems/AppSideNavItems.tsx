@@ -127,6 +127,15 @@ export const AppSideNavItems = ({
           ) : null}
           <ul className="p-side-navigation__list">
             <AppSideNavItem
+              icon="help"
+              navLink={{
+                label: "Documentation",
+                url: "https://maas.io/docs/",
+              }}
+              path={path}
+              setIsCollapsed={setIsCollapsed}
+            />
+            <AppSideNavItem
               icon="profile"
               navLink={{
                 label: `${authUser?.username}`,
