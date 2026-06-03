@@ -11,6 +11,7 @@ import PoolColumn from "./PoolColumn";
 import PowerColumn from "./PowerColumn";
 import RamColumn from "./RamColumn";
 import StatusColumn from "./StatusColumn";
+import RestrictedStatusColumn from "./StatusColumn/RestrictedStatusColumn";
 import StorageColumn from "./StorageColumn";
 import ZoneColumn from "./ZoneColumn";
 import type {
@@ -322,6 +323,93 @@ export const generateRows = ({
   });
 };
 
+const generateRestrictedRows = ({
+  callId,
+  groupValue,
+  hiddenColumns,
+  machines,
+  getToggleHandler,
+  selectionMode,
+  showActions,
+  showMAC,
+}: GenerateRowParams): RowReturnType[] => {
+  const getMenuHandler: GetMachineMenuToggleHandler = (...args) =>
+    showActions ? getToggleHandler(...args) : () => undefined;
+
+  return machines.map((row) => {
+    const content = {
+      [MachineColumns.FQDN]: (
+        <NameColumn
+          callId={callId}
+          data-testid="fqdn-column"
+          groupValue={groupValue}
+          machines={machines}
+          selectionMode={selectionMode}
+          showActions={showActions}
+          showMAC={showMAC}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.POWER]: (
+        <PowerColumn
+          data-testid="power-column"
+          onToggleMenu={getMenuHandler(MachineColumns.POWER)}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.STATUS]: (
+        <RestrictedStatusColumn
+          data-testid="status-column"
+          onToggleMenu={getMenuHandler(MachineColumns.STATUS)}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.OWNER]: (
+        <OwnerColumn
+          data-testid="owner-column"
+          onToggleMenu={getMenuHandler(MachineColumns.OWNER)}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.POOL]: (
+        <PoolColumn
+          data-testid="pool-column"
+          onToggleMenu={getMenuHandler(MachineColumns.POOL)}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.ZONE]: (
+        <ZoneColumn
+          data-testid="zone-column"
+          onToggleMenu={getMenuHandler(MachineColumns.ZONE)}
+          systemId={row.system_id}
+        />
+      ),
+      [MachineColumns.FABRIC]: (
+        <FabricColumn data-testid="fabric-column" systemId={row.system_id} />
+      ),
+      [MachineColumns.CPU]: (
+        <CoresColumn data-testid="cpu-column" systemId={row.system_id} />
+      ),
+      [MachineColumns.MEMORY]: (
+        <RamColumn data-testid="memory-column" systemId={row.system_id} />
+      ),
+      [MachineColumns.DISKS]: (
+        <DisksColumn data-testid="disks-column" systemId={row.system_id} />
+      ),
+      [MachineColumns.STORAGE]: (
+        <StorageColumn data-testid="storage-column" systemId={row.system_id} />
+      ),
+    };
+    return generateRow({
+      key: row.system_id,
+      content,
+      hiddenColumns,
+      showActions,
+    });
+  });
+};
+
 export const generateGroupRows = ({
   callId,
   grouping,
@@ -435,7 +523,7 @@ export const generateRestrictedGroupRows = ({
           return groupMachines;
         }, []);
     rows = rows.concat(
-      generateRows({
+      generateRestrictedRows({
         ...rowProps,
         callId,
         groupValue: group.value,
@@ -473,7 +561,7 @@ export const generateRestrictedRowsFromStatusGroups = ({
         }, []);
 
     rows = rows.concat(
-      generateRows({
+      generateRestrictedRows({
         ...rowProps,
         callId,
         groupValue: group.value,
