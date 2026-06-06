@@ -99,6 +99,7 @@ const Progress = ({ machine }: { machine: Machine | null }) => {
 };
 
 const actions: MachineMenuAction[] = [
+  NodeActions.ABORT,
   NodeActions.DEPLOY,
   NodeActions.RELEASE,
   NodeActions.LOCK,
