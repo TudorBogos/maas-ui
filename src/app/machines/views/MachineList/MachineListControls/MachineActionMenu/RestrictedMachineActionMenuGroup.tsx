@@ -16,7 +16,7 @@ type ActionLink = DataTestElement<ButtonProps>;
 
 const actionGroups: ActionGroup[] = [
   {
-    actions: [NodeActions.DEPLOY, NodeActions.RELEASE],
+    actions: [NodeActions.ABORT, NodeActions.DEPLOY, NodeActions.RELEASE],
     title: "Actions",
   },
   {
