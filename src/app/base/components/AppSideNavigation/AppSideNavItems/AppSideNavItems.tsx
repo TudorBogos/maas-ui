@@ -126,9 +126,21 @@ export const AppSideNavItems = ({
             </ul>
           ) : null}
           <ul className="p-side-navigation__list">
+            {isAdmin && (
+              <AppSideNavItem
+                navLink={{
+                  external: true,
+                  label: "MAAS Lease Manager",
+                  url: "/manager/",
+                }}
+                path={path}
+                setIsCollapsed={setIsCollapsed}
+              />
+            )}
             <AppSideNavItem
               icon="help"
               navLink={{
+                external: true,
                 label: "Documentation",
                 url: "https://maas.io/docs/",
               }}

@@ -25,7 +25,6 @@ export const AppSideNavItem = ({
   setIsCollapsed,
 }: Props): React.ReactElement => {
   const id = useId();
-  const isExternal = /^https?:\/\//.test(navLink.url);
   const linkContent = (
     <>
       {icon ? (
@@ -53,7 +52,7 @@ export const AppSideNavItem = ({
       aria-labelledby={`${navLink.label}-${id}`}
       className={classNames({ "is-selected": isSelected(path, navLink) })}
     >
-      {isExternal ? (
+      {navLink.external ? (
         <Navigation.Link
           as="a"
           href={navLink.url}
