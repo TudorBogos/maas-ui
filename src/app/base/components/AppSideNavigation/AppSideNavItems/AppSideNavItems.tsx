@@ -128,9 +128,10 @@ export const AppSideNavItems = ({
           <ul className="p-side-navigation__list">
             {isAdmin && (
               <AppSideNavItem
+                icon="machines"
                 navLink={{
                   external: true,
-                  label: "MAAS Lease Manager",
+                  label: "MAAS manager",
                   url: "/manager/",
                 }}
                 path={path}

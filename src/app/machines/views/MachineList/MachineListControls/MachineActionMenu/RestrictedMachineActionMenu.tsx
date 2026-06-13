@@ -10,6 +10,7 @@ import { NodeActions } from "@/app/store/types/node";
 import { getNodeActionTitle } from "@/app/store/utils";
 
 const restrictedExcludedActions = [
+  NodeActions.ABORT,
   NodeActions.ACQUIRE,
   NodeActions.CHECK_POWER,
   NodeActions.CLONE,
