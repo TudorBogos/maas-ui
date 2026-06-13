@@ -7,6 +7,7 @@ import type { Action, Dispatch } from "redux";
 import CloneForm from "./CloneForm";
 import CommissionForm from "./CommissionForm";
 import DeployForm from "./DeployForm";
+import RestrictedDeployForm from "./DeployForm/RestrictedDeployForm";
 import MarkBrokenForm from "./MarkBrokenForm";
 import OverrideTestForm from "./OverrideTestForm";
 import ReleaseForm from "./ReleaseForm";
@@ -129,7 +130,12 @@ export const MachineActionForm = ({
         {...commonNodeFormProps}
       />
     ),
-    [NodeActions.DEPLOY]: () => <DeployForm {...commonMachineFormProps} />,
+    [NodeActions.DEPLOY]: () =>
+      isRestricted ? (
+        <RestrictedDeployForm {...commonMachineFormProps} />
+      ) : (
+        <DeployForm {...commonMachineFormProps} />
+      ),
     [NodeActions.MARK_BROKEN]: () => (
       <MarkBrokenForm {...commonMachineFormProps} />
     ),
