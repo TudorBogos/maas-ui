@@ -10,6 +10,7 @@ This repository builds the static MAAS web UI served from `/MAAS/r/`.
 
 - [PREREQUISITES.md](PREREQUISITES.md): local build and production host prerequisites
 - [DEPLOYMENT.md](DEPLOYMENT.md): GitLab CI deployment, sudoers, and manual deploy commands
+- [nginx.conf](nginx.conf): production nginx site for serving the SPA under `/MAAS/r/`
 - [CANONICAL_README.md](CANONICAL_README.md): original Canonical MAAS UI documentation
 - [GIT.md](GIT.md): Git remote setup
 
