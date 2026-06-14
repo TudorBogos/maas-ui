@@ -25,7 +25,7 @@ Build output is written to `build/`. The package is configured for the
 Production deployment uses a shell GitLab Runner on the web host that serves:
 
 ```text
-/var/www/branded-ui/MAAS/r
+/var/www/branded-ui
 ```
 
 Install these packages on the host:
@@ -34,6 +34,7 @@ Install these packages on the host:
 - Yarn
 - Git
 - rsync
+- nginx
 
 Required Linux users and groups:
 
