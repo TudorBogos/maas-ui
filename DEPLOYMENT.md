@@ -33,13 +33,15 @@ yarn install --frozen-lockfile
 yarn build
 ```
 
-The deploy job then installs the repository nginx site config and mirrors the
-build output:
+The deploy job then installs the repository nginx site config, mirrors the
+build output, validates nginx, and reloads nginx:
 
 ```bash
 sudo /usr/bin/install -m 0644 nginx.conf /etc/nginx/sites-available/branded-ui
 sudo /usr/bin/install -d -o www-data -g deploy -m 2774 /var/www/branded-ui
 sudo /usr/bin/rsync -a --delete --chown=www-data:deploy --chmod=D2774,F0774 build/ /var/www/branded-ui/
+sudo /usr/sbin/nginx -t
+sudo /usr/bin/systemctl reload nginx
 ```
 
 ## Sudoers
@@ -50,7 +52,7 @@ repository. Deploy it with `visudo`, preferably as
 `/etc/sudoers.d/gitlab-runner-branded-ui`:
 
 ```sudoers
-gitlab-runner ALL=(root) NOPASSWD: /usr/bin/install -m 0644 nginx.conf /etc/nginx/sites-available/branded-ui, /usr/bin/install -d -o www-data -g deploy -m 2774 /var/www/branded-ui, /usr/bin/rsync -a --delete --chown=www-data\:deploy --chmod=D2774\,F0774 build/ /var/www/branded-ui/
+gitlab-runner ALL=(root) NOPASSWD: /usr/bin/install -m 0644 nginx.conf /etc/nginx/sites-available/branded-ui, /usr/bin/install -d -o www-data -g deploy -m 2774 /var/www/branded-ui, /usr/bin/rsync -a --delete --chown=www-data\:deploy --chmod=D2774\,F0774 build/ /var/www/branded-ui/, /usr/sbin/nginx -t, /usr/bin/systemctl reload nginx
 ```
 
 The CI deploy job uses explicit ownership and permission modes so deployment
@@ -73,4 +75,6 @@ yarn build
 sudo /usr/bin/install -m 0644 nginx.conf /etc/nginx/sites-available/branded-ui
 sudo /usr/bin/install -d -o www-data -g deploy -m 2774 /var/www/branded-ui
 sudo /usr/bin/rsync -a --delete --chown=www-data:deploy --chmod=D2774,F0774 build/ /var/www/branded-ui/
+sudo /usr/sbin/nginx -t
+sudo /usr/bin/systemctl reload nginx
 ```

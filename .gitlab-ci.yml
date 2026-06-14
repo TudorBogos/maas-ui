@@ -28,3 +28,5 @@ deploy:
     - sudo /usr/bin/install -m 0644 nginx.conf /etc/nginx/sites-available/branded-ui
     - sudo /usr/bin/install -d -o www-data -g deploy -m 2774 /var/www/branded-ui
     - sudo /usr/bin/rsync -a --delete --chown=www-data:deploy --chmod=D2774,F0774 build/ /var/www/branded-ui/
+    - sudo /usr/sbin/nginx -t
+    - sudo /usr/bin/systemctl reload nginx
