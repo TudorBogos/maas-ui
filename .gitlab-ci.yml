@@ -1,11 +1,25 @@
 stages:
+  - test
   - check
   - deploy
+
+test-restricted:
+  stage: test
+  tags:
+    - maas-check
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+  script:
+    - yarn install --frozen-lockfile
+    - TZ=UTC yarn vitest run src/restricted-tests
 
 check:
   stage: check
   tags:
     - maas-check
+  needs:
+    - test-restricted
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push"'
